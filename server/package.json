@@ -1,0 +1,23 @@
+{
+  "name": "cryptobike",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iandelrio/CryptoBike.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iandelrio/CryptoBike/issues"
+  },
+  "homepage": "https://github.com/iandelrio/CryptoBike#readme",
+  "dependencies": {
+    "express": "^4.16.4",
+    "truffle": "^5.0.4"
+  }
+}
