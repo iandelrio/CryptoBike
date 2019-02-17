@@ -1,0 +1,27 @@
+{
+  "name": "cryptobike",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iandelrio/CryptoBike.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iandelrio/CryptoBike/issues"
+  },
+  "homepage": "https://github.com/iandelrio/CryptoBike#readme",
+  "dependencies": {
+    "@0xcert/ethereum-erc721": "^2.0.0-rc1",
+    "babel-polyfill": "^6.26.0",
+    "babel-register": "^6.26.0",
+    "express": "^4.16.4",
+    "global": "^4.3.2",
+    "truffle": "^5.0.4"
+  }
+}
