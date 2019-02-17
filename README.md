@@ -11,7 +11,7 @@ The web app is hosted on Microsoft Azure and is built on Node.js and Azure SQL D
 
 ## Website Requirements
 * User registration and login
-*
+* Geographical search for bikes
 
 ## Use cases:
 ### Requirements:
@@ -25,7 +25,6 @@ The web app is hosted on Microsoft Azure and is built on Node.js and Azure SQL D
   * Renter unlocks CryptoLock
 ### Use case 3:
   * Set off alarm
-
 
 ## Future features
 * Owner gets notified:
