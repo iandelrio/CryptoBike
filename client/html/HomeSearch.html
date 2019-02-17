@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head id="header">
+  
+  <script src="/dev/CryptoBike/client/vendor/jquery/jquery.min.js"></script>
   <title>CryptoBike</title>
   <!-- Header -->
   <div id="load-header"></div>
@@ -21,8 +23,8 @@
   <!-- Footer -->
   <script >
     // jquery load
-    $( "#load-header" ).load( "/getHeaderHTML #header" );
-    $( "#load-navigation" ).load( "/getNavigation #navigation" );
-    $( "#load-footer" ).load( "/getFooter #footer" );
+    $( "#load-header" ).load( "/dev/CryptoBike/client/html/SharedLayout.html #header" );
+    $( "#load-navigation" ).load( "/getSharedLayout #navigation" );
+    $( "#load-footer" ).load( "/getSharedLayout #footer" );
   </script>
 </body>
