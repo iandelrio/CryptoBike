@@ -1,5 +1,5 @@
-var GradientToken = artifacts.require("GradientToken");
+var CryptoBike = artifacts.require("CryptoBike");
 
 module.exports = function(deployer) {
-    deployer.deploy(GradientToken);
+    deployer.deploy(CryptoBike);
 };
