@@ -3,4 +3,5 @@
 *.aux
 *.gz
 .ideaserver/package-lock.json
-server/node_modules/
+node_modules/
+package-lock.json
