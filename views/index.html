@@ -31,7 +31,22 @@
   <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
   <script src="https://atlas.microsoft.com/sdk/js/atlas-service.js?api-version=1"></script>
 
-  <script>        
+  <script>
+
+  var vlat, vlon;
+  // Get current location
+  if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+       vlat = position.coords.latitude;
+       vlon = position.coords.longitude;
+       console.log(vlat)
+       console.log(vlon)
+      });
+    } else { 
+       vlat = 43.6629;
+       vlon = -79.3957;
+    }
+
   var map, datasource, client, popup;
 
   function GetMap(){
@@ -63,8 +78,8 @@
 
        //Execute a POI search query then add the results to the map.
         client.search.getSearchPOI('gasoline station', {
-            lat: 43.6629,
-            lon: 79.3957,
+            lat: vlat,
+            lon: vlon,
             radius: 100000
         }).then(response => {
             //Parse the response into GeoJSON so that the map can understand.
@@ -90,9 +105,10 @@
   <style>
     #map {
       width: 100%;
+      height: 100%;
     }
     .portfolio {
-      height: 1200px;
+      height: 800px;
     }
   </style>
 
@@ -136,8 +152,8 @@
     <div class="container">
       <h2 class="text-center text-uppercase text-secondary mb-0">Bike Search</h2>
       <hr class="star-dark mb-5">
-      <div class="row">
-        <div id="myMap" class="container" style="height: auto;"></div>
+      <div class="row" style="height: 500px">
+        <div id="myMap" class="container"></div>
       </div>
     </div>
   </section>
