@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head id="header">
+  <title>CryptoBike</title>
+  <!-- Header -->
+  <div id="load-header"></div>
+</head>
+
+<body id="page-top">
+  <!-- Navigation -->
+  <div id="load-navigation"></div>
+  <header class="masthead bg-primary text-white text-center">
+    <div class="container">
+      <h1 class="text-uppercase mb-0">CryptoBikes</h1>
+      <hr class="star-light">
+      <h2 class="font-weight-light mb-0">Bike-sharing with a side of cryptographical verification</h2>
+    </div>
+  </header>
+  <div id="load-footer"></div>
+  <!-- Footer -->
+  <script >
+    // jquery load
+    $( "#load-header" ).load( "/getHeaderHTML #header" );
+    $( "#load-navigation" ).load( "/getNavigation #navigation" );
+    $( "#load-footer" ).load( "/getFooter #footer" );
+  </script>
+</body>
