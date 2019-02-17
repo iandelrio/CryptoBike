@@ -1,5 +1,4 @@
 const express = require('express');
-const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 
 /** Init **/
@@ -22,18 +21,6 @@ app
   .use(express.static('/var/www/html/dist'))
   .use(allowCrossDomain)
   .use(bodyParser.urlencoded());
-
-//nodemailer config 
-// set up mail sender
-var transporter = nodemailer.createTransport({
-  service: 'gmail',
-  port: 465,
-  secure: true,
-  auth: {
-    user: 'sdlt.mail.info@gmail.com',
-    pass: 'Super Secret SDLT PASS'
-  }
-});
 
 let path = '/var/www/html';
 
