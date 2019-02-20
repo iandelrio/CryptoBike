@@ -5494,12 +5494,12 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x2f1E99F176f1Ad23F75dC5a30e585ecfc04a82b8",
-      "transactionHash": "0x031db1b9a8b76c90b4eea34a46932e663d2849bb718bd06a8910b844e91c622f"
+      "address": "0x9E02De56374472014d7Ab7b1734Cf0dE01285670",
+      "transactionHash": "0x8f795219453c111e9299cc6175a2e01de0f936fcc4219ca8408d09d93d7916b2"
     }
   },
   "schemaVersion": "3.0.2",
-  "updatedAt": "2019-02-17T14:25:25.845Z",
+  "updatedAt": "2019-02-17T19:49:32.581Z",
   "devdoc": {
     "methods": {
       "approve(address,uint256)": {
