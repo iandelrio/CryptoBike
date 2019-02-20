@@ -24,14 +24,121 @@
   <!-- Custom styles for this template -->
   <link href="css/cryptobike.min.css" rel="stylesheet">
 
+  <!-- Add references to the Azure Maps Map control JavaScript and CSS files. -->
+  <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/css/atlas.min.css?api-version=1" type="text/css" />
+  <script src="https://atlas.microsoft.com/sdk/js/atlas.min.js?api-version=1"></script>
+
+  <!-- Add a reference to the Azure Maps Services Module JavaScript file. -->
+  <script src="https://atlas.microsoft.com/sdk/js/atlas-service.js?api-version=1"></script>
+
+  <script>
+
+  var vlat, vlon;
+  // Get current location
+  if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function (position) {
+       vlat = position.coords.latitude;
+       vlon = position.coords.longitude;
+      });
+    } else { 
+       vlat = 43.6629;
+       vlon = -79.3957;
+    }
+
+  var map, datasource, client, popup;
+
+  function GetMap(){
+    //Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
+    atlas.setSubscriptionKey('xx1k0hE_ZgnkoUnL5jqfYDK_9azswhfjNkFJFWw89Yw');
+
+    //Initialize a map instance.
+    map = new atlas.Map('myMap');
+
+    //Wait until the map resources have fully loaded.
+    map.events.add('load', function () {
+
+      //Create a data source and add it to the map.
+      datasource = new atlas.source.DataSource();
+      map.sources.add(datasource);
+
+      //Add a layer for rendering point data.
+      var resultLayer = new atlas.layer.SymbolLayer(datasource, null, {
+        iconOptions: {
+           iconImage: 'pin-round-darkblue',
+           anchor: 'center',
+           allowOverlap: true
+        }
+      });
+
+      map.layers.add(resultLayer);
+
+      //Create an instance of the services client.
+       client = new atlas.service.Client(atlas.getSubscriptionKey());
+
+       //Execute a POI search query then add the results to the map.
+        client.search.getSearchPOI('cafe', {
+            lat: 43.6629,
+            lon: -79.3957,
+            radius: 100000
+        }).then(response => {
+            //Parse the response into GeoJSON so that the map can understand.
+            var geojsonResponse = new atlas.service.geojson.GeoJsonSearchResponse(response);
+            var results = geojsonResponse.getGeoJsonResults();
+
+            //Add the results to the data source so they can be rendered. 
+            datasource.add(results);
+
+            // Set the camera bounds
+            map.setCamera({
+                bounds: results.bbox,
+                padding: 50
+            });
+        });
+
+      //Create a popup but leave it closed so we can update it and display it later.
+      popup = new atlas.Popup();
+      
+      //Add a mouse over event to the result layer and display a popup when this event fires.
+      map.events.add('mouseover', resultLayer, showPopup);
+
+      });
+
+  }
+
+  function showPopup(e) {
+      //Get the properties and coordinates of the first shape that the event occured on.
+      var p = e.shapes[0].getProperties();
+      console.log(p)
+      var position = e.shapes[0].getCoordinates();
+      //Create HTML from properties of the selected result.
+      var html = ['<div style="padding:5px"><div><b>', p.poi.name,
+          '</b></div><div>', p.address.freeformAddress,
+          '</div><div>', position[1], ', ', position[0], '</div></div>'];
+      //Update the content and position of the popup.
+      popup.setOptions({
+          content: html.join(''),
+          position: position
+      });
+      //Open the popup.
+      popup.open(map);
+  }
+
+  </script>
+  <style>
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+
 </head>
 
-<body id="page-top">
+<body id="page-top" onload="GetMap()">
 
   <!-- Navigation -->
   <nav class="navbar navbar-expand-lg bg-secondary fixed-top text-uppercase" id="mainNav">
     <div class="container">
-      <a class="navbar-brand js-scroll-trigger" href="#page-top">CryptoBike</a>
+      <a id="sup" class="navbar-brand js-scroll-trigger" href="#page-top">CryptoBike</a>
       <button class="navbar-toggler navbar-toggler-right text-uppercase bg-primary text-white rounded" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         Menu
         <i class="fas fa-bars"></i>
@@ -56,16 +163,18 @@
       <h1 class="text-uppercase mb-0">CryptoBike</h1>
       <hr class="star-light">
       <h2 class="font-weight-light mb-0">Bike-sharing with a side of cryptographical verification.</h2>
+  
+  <!-- <button id="sup-btn">click me</button> -->
     </div>
   </header>
 
-  <!-- Portfolio Grid Section -->
+  <!-- Bike Search Section -->
   <section class="portfolio" id="search">
     <div class="container">
       <h2 class="text-center text-uppercase text-secondary mb-0">Bike Search</h2>
       <hr class="star-dark mb-5">
-      <div class="row">
-        sup
+      <div class="row" style="height: 500px">
+        <div id="myMap" class="container"></div>
       </div>
     </div>
   </section>
@@ -159,7 +268,34 @@
           <div class="col-lg-8 mx-auto">
             <h2 class="text-secondary text-uppercase mb-0">Log In</h2>
             <hr class="star-dark mb-5">
-            <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia neque assumenda ipsam nihil, molestias magnam, recusandae quos quis inventore quisquam velit asperiores, vitae? Reprehenderit soluta, eos quod consequuntur itaque. Nam.</p>
+            <form name="sentMessage" id="contactForm" novalidate="novalidate">
+                        <div class="control-group">
+                          <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                            <label>Name</label>
+                            <input class="form-control" id="name" type="text" placeholder="Name" required="required" data-validation-required-message="Please enter your name.">
+                            <p class="help-block text-danger"></p>
+                          </div>
+                        </div>
+                        <div class="control-group">
+                          <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                            <label>Email Address</label>
+                            <input class="form-control" id="email" type="email" placeholder="Email Address" required="required" data-validation-required-message="Please enter your email address.">
+                            <p class="help-block text-danger"></p>
+                          </div>
+                        </div>
+                        <div class="control-group">
+                          <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                            <label>Phone Number</label>
+                            <input class="form-control" id="phone" type="tel" placeholder="Phone Number" required="required" data-validation-required-message="Please enter your phone number.">
+                            <p class="help-block text-danger"></p>
+                          </div>
+                        </div>
+                        <br>
+                        <div id="success"></div>
+                        <div class="form-group">
+                          <button class="btn btn-primary btn-xl portfolio-modal-dismiss" id="register">Register</button>
+                        </div>
+                      </form>
             <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
               <i class="fa fa-close"></i>
               Close</a>
@@ -200,6 +336,26 @@
 
   <!-- Custom scripts for this template -->
   <script src="js/cryptobike.min.js"></script>
+
+  <script type="text/javascript">
+    $("#sup-btn").click(function() {
+      var data = {};
+      data.title = "title";
+      data.message = "message";
+
+      $.ajax({
+        type: 'POST',
+        data: JSON.stringify(data),
+        contentType: 'application/json',
+        url: '/test',
+        success: function(data) {
+          $("#sup").text(data.title);
+        }
+      });
+
+    });
+    
+  </script>
 
 </body>
 

@@ -4,3 +4,5 @@
 *.gz
 .idea
 package-lock.json
+index1.html
+public/data/
