@@ -32,96 +32,170 @@
   <script src="https://atlas.microsoft.com/sdk/js/atlas-service.js?api-version=1"></script>
 
   <script>
+    const Models = ['Merida', 'Kona', 'Yeti', 'Marin', 'Cannondale', 'Specialized', 'Trek', 'Santa Cruz', 'GT Bikes', 'Giant'];
+    const Functions = ['Road', 'Touring', 'BMX', 'Hybrid Trekking', 'Cruiser', 'Hybrid City', 'Hybrid Comfort', 'Flat Bar', 'Cyclo-cross', 'Racing'];
+    const Owners = ['Barbro Aristarchos', 'Carmina Kenneth', 'Deirdre Sophos', 'Haunani Antipatros', 'Iulianus Cornell', 'Sherri Aleksi', 'Emma Jalil', 'Beathan Meiriona', 'Alfher Tziporah', 'Raina Monroe'];
+    let vlat, vlon;
+    // Get current location
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+        vlat = position.coords.latitude;
+        vlon = position.coords.longitude;
+        });
+      } else { 
+        vlat = 43.6629;
+        vlon = -79.3957;
+      }
 
-  var vlat, vlon;
-  // Get current location
-  if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(function (position) {
-       vlat = position.coords.latitude;
-       vlon = position.coords.longitude;
-      });
-    } else { 
-       vlat = 43.6629;
-       vlon = -79.3957;
-    }
+    let map, datasource, client, popup;
 
-  var map, datasource, client, popup;
+    let GetMap = () => {
+      //Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
+      atlas.setSubscriptionKey('xx1k0hE_ZgnkoUnL5jqfYDK_9azswhfjNkFJFWw89Yw');
 
-  function GetMap(){
-    //Add your Azure Maps subscription key to the map SDK. Get an Azure Maps key at https://azure.com/maps
-    atlas.setSubscriptionKey('xx1k0hE_ZgnkoUnL5jqfYDK_9azswhfjNkFJFWw89Yw');
+      //Initialize a map instance.
+      map = new atlas.Map('myMap');
 
-    //Initialize a map instance.
-    map = new atlas.Map('myMap');
+      //Wait until the map resources have fully loaded.
+      map.events.add('load', function () {
 
-    //Wait until the map resources have fully loaded.
-    map.events.add('load', function () {
+        //Create a data source and add it to the map.
+        datasource = new atlas.source.DataSource();
+        map.sources.add(datasource);
 
-      //Create a data source and add it to the map.
-      datasource = new atlas.source.DataSource();
-      map.sources.add(datasource);
-
-      //Add a layer for rendering point data.
-      var resultLayer = new atlas.layer.SymbolLayer(datasource, null, {
-        iconOptions: {
-           iconImage: 'pin-round-darkblue',
-           anchor: 'center',
-           allowOverlap: true
-        }
-      });
-
-      map.layers.add(resultLayer);
-
-      //Create an instance of the services client.
-       client = new atlas.service.Client(atlas.getSubscriptionKey());
-
-       //Execute a POI search query then add the results to the map.
-        client.search.getSearchPOI('cafe', {
-            lat: 43.6629,
-            lon: -79.3957,
-            radius: 100000
-        }).then(response => {
-            //Parse the response into GeoJSON so that the map can understand.
-            var geojsonResponse = new atlas.service.geojson.GeoJsonSearchResponse(response);
-            var results = geojsonResponse.getGeoJsonResults();
-
-            //Add the results to the data source so they can be rendered. 
-            datasource.add(results);
-
-            // Set the camera bounds
-            map.setCamera({
-                bounds: results.bbox,
-                padding: 50
-            });
+        //Add a layer for rendering point data.
+        var resultLayer = new atlas.layer.SymbolLayer(datasource, null, {
+          iconOptions: {
+            iconImage: 'pin-round-darkblue',
+            anchor: 'center',
+            allowOverlap: true
+          }
         });
 
-      //Create a popup but leave it closed so we can update it and display it later.
-      popup = new atlas.Popup();
-      
-      //Add a mouse over event to the result layer and display a popup when this event fires.
-      map.events.add('mouseover', resultLayer, showPopup);
+        map.layers.add(resultLayer);
 
+        //Create an instance of the services client.
+        client = new atlas.service.Client(atlas.getSubscriptionKey());
+        
+        //Execute a POI search query then add the results to the map.
+        client.search.getSearchPOI('cafe', {
+          lat: 43.6629,
+          lon: -79.3957,
+          radius: 100000
+        })
+        .then(response => {
+          //Parse the response into GeoJSON so that the map can understand.
+          var geojsonResponse = new atlas.service.geojson.GeoJsonSearchResponse(response);
+          var results = geojsonResponse.getGeoJsonResults();
+
+          //Add the results to the data source so they can be rendered. 
+          datasource.add(results);
+
+          // Set the camera bounds
+          map.setCamera({
+              bounds: results.bbox,
+              padding: 50
+          });
+        });
+
+        //Create a popup but leave it closed so we can update it and display it later.
+        popup = new atlas.Popup();
+        
+        //Add a click event to the result layer and display a popup when this event fires.
+        map.events.add('click', resultLayer, showPopup);
       });
+    }
 
-  }
-
-  function showPopup(e) {
+    let showPopup = (e) => {
       //Get the properties and coordinates of the first shape that the event occured on.
-      var p = e.shapes[0].getProperties();
-      console.log(p)
-      var position = e.shapes[0].getCoordinates();
+      let p = e.shapes[0].getProperties();
+      let bike = create_bike();
+      let position = e.shapes[0].getCoordinates();
+
+      console.log(bike)
+
       //Create HTML from properties of the selected result.
-      var html = ['<div style="padding:5px"><div><b>', p.poi.name,
-          '</b></div><div>', p.address.freeformAddress,
-          '</div><div>', position[1], ', ', position[0], '</div></div>'];
+      var html = ['<div><b>', p.address.freeformAddress,
+        '</b><p>Bike Function: ' + bike.function + '<br>',
+        'Bike Model: ' + bike.model + '<br>',
+        'Bike Owner: ' + bike.owner.name + '</p>',
+        '</div><div id="btn"></div></div>'];
+
       //Update the content and position of the popup.
       popup.setOptions({
-          content: html.join(''),
-          position: position
+        content: html.join(''),
+        position: position
       });
+
       //Open the popup.
       popup.open(map);
-  }
+
+              
+      let button = document.createElement('a');
+      button.textContent = 'Book this bike!';
+      button.href = '#log-in-modal';
+      button.className = 'map-entity';
+      button.id = 'map';
+      button.addEventListener('click', () => {
+        $.magnificPopup.open({
+          items: {
+              src: '#log-in-modal'
+          },
+          closeOnContentClick : false, 
+          closeOnBgClick :true, 
+          showCloseBtn : true, 
+          enableEscapeKey : true
+          // closeMarkup: '<button class="mfp-close mfp-new-close" type="button" title="Close (Esc)"> { costume button with close icon image } </button>'
+        });
+      });
+      document.getElementById('bike_function').innerHTML = bike.function;
+      document.getElementById('bike_model').innerHTML = bike.model;
+      document.getElementById('bike_owner').innerHTML = bike.owner.name;
+      document.getElementById('btn').appendChild(button);
+    }
+
+    let create_bike = () => {
+      // TODO: Add bike picture
+      // TODO: Add comments
+
+      return {
+        id: random_id(),
+        model: random_bike_model(),
+        function: random_bike_function(),
+        owner: random_owner()
+      };
+    };
+
+    let random_bike_model = () => {
+      return Models[Math.floor(Math.random() * 10)];
+    };
+
+    let random_bike_function = () => {
+      return Functions[Math.floor(Math.random() * 10)];
+    };
+
+    let random_owner = () => {
+      return {
+        id: random_id(),
+        name: Owners[Math.floor(Math.random() * 10)]
+      }
+    };
+
+    let random_id = () => {
+      return Math.random().toString(36).substring(8);
+    }
+
+    let bake_cookie = (name, value) => {
+      let cookie = [name, '=', JSON.stringify(value), '; domain=.', window.location.host.toString(), '; path=/;'].join('');
+      document.cookie += ', ' + cookie;
+      console.log(document.cookie);
+    }
+
+    let read_cookie = (name) => {
+      var result = document.cookie.match(new RegExp(name + '=([^;]+)'));
+      result && (result = JSON.parse(result[1]));
+      return result;
+    }
 
   </script>
   <style>
@@ -266,39 +340,45 @@
       <div class="container text-center">
         <div class="row">
           <div class="col-lg-8 mx-auto">
-            <h2 class="text-secondary text-uppercase mb-0">Log In</h2>
+            <h2 class="text-secondary text-uppercase mb-0">Book this bike</h2>
             <hr class="star-dark mb-5">
+            <div>
+              <h4 class="text-secondary">Bike details:</h4>
+              <p>Bike Function: <span id="bike_function"></span></p>
+              <p>Bike Model: <span id="bike_model"></span></p>
+              <p>Owner: <span id="bike_owner"></span></p>
+            </div>
             <form name="sentMessage" id="contactForm" novalidate="novalidate">
-                        <div class="control-group">
-                          <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                            <label>Name</label>
-                            <input class="form-control" id="name" type="text" placeholder="Name" required="required" data-validation-required-message="Please enter your name.">
-                            <p class="help-block text-danger"></p>
-                          </div>
-                        </div>
-                        <div class="control-group">
-                          <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                            <label>Email Address</label>
-                            <input class="form-control" id="email" type="email" placeholder="Email Address" required="required" data-validation-required-message="Please enter your email address.">
-                            <p class="help-block text-danger"></p>
-                          </div>
-                        </div>
-                        <div class="control-group">
-                          <div class="form-group floating-label-form-group controls mb-0 pb-2">
-                            <label>Phone Number</label>
-                            <input class="form-control" id="phone" type="tel" placeholder="Phone Number" required="required" data-validation-required-message="Please enter your phone number.">
-                            <p class="help-block text-danger"></p>
-                          </div>
-                        </div>
-                        <br>
-                        <div id="success"></div>
-                        <div class="form-group">
-                          <button class="btn btn-primary btn-xl portfolio-modal-dismiss" id="register">Register</button>
-                        </div>
-                      </form>
-            <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-              <i class="fa fa-close"></i>
-              Close</a>
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                  <label>Name</label>
+                  <input class="form-control" id="name" type="text" placeholder="Name" required="required" data-validation-required-message="Please enter your name.">
+                  <p class="help-block text-danger"></p>
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                  <label>Email Address</label>
+                  <input class="form-control" id="email" type="email" placeholder="Email Address" required="required" data-validation-required-message="Please enter your email address.">
+                  <p class="help-block text-danger"></p>
+                </div>
+              </div>
+              <div class="control-group">
+                <div class="form-group floating-label-form-group controls mb-0 pb-2">
+                  <label>Phone Number</label>
+                  <input class="form-control" id="phone" type="tel" placeholder="Phone Number" required="required" data-validation-required-message="Please enter your phone number.">
+                  <p class="help-block text-danger"></p>
+                </div>
+              </div>
+              <br>
+              <div id="success"></div>
+              <!-- <div class="form-group">
+                <button class="btn btn-primary btn portfolio-modal-dismiss" id="register">Book</button>
+              </div> -->
+              <a class="btn btn-primary btn-lg rounded-pill">
+                <i class="fa fa-close"></i>
+                Book</a>
+            </form>
           </div>
         </div>
       </div>

@@ -20,22 +20,25 @@ contract CryptoBike is ERC721Token, Ownable {
     address public owner;
 
     struct Trip {
-        int256 latitude; // location latitude
-        int256 longitude; // location longitude
+        string rent_address; // address where rented
         int256 rf_id; // generated RFID
-        string start_time;
-        string end_time;
+        string start_time; // timestamp of rental start
+        string end_time; // timestamp of rental end
         string renter_id; // renter's ID
+        string renter_name;
+        string renter_email;
+        string renter_phone;
     }
     
     struct Bike {
         string model; // bike model
         string owner_id; // owner's ID
+        string owner_name; // owner's ID
         mapping(uint => Trip) trips;
         uint numTrips;
         // Trip[] trips;
         bool active_trip;
-        // string bike_id; // bike's ID
+        string bike_id; // bike's ID
     }
     
     constructor() public ERC721Token("CryptoBike", "BIKE") {
@@ -48,7 +51,7 @@ contract CryptoBike is ERC721Token, Ownable {
         bikes[bike_id] = Bike(model, owner_id, 0, false);
     }
     
-    function rent_bike(uint bike_id, string memory renter_id, int256 latitude, int256 longitude, int256 rf_id, string memory start_time) private returns (bool success) {
+    function rent_bike(uint bike_id, string memory renter_id, string memory renter_name, string memory renter_email, string memory renter_phone, string memory rent_address, int256 rf_id, string memory start_time) private returns (bool success) {
         Bike storage bike = bikes[bike_id];
         uint trip_id;
 
@@ -58,7 +61,7 @@ contract CryptoBike is ERC721Token, Ownable {
         }
         
         // Trip storage trip = Trip(latitude, longitude, rf_id, start_time, "", renter_id);
-        bike.trips[trip_id] = Trip(latitude, longitude, rf_id, start_time, "", renter_id);
+        bike.trips[trip_id] = Trip(rent_address, rf_id, start_time, "", renter_id);
         bike.active_trip = true;
         
         return true;
