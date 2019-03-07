@@ -61,6 +61,22 @@
     $.magnificPopup.close();
   });
 
+  // Modal popup$(function () {
+  $('.map-entity').magnificPopup({
+    // type: 'inline',
+    preloader: true,
+    // focus: '#username',
+    modal: true
+  });
+
+  // Modal popup$(function () {
+  $('#map').magnificPopup({
+    // type: 'inline',
+    preloader: true,
+    // focus: '#username',
+    modal: true
+  });
+
   // Floating label headings for the contact form
   $(function() {
     $("body").on("input propertychange", ".floating-label-form-group", function(e) {

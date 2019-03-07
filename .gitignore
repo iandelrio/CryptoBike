@@ -5,4 +5,5 @@
 .idea
 package-lock.json
 index1.html
-public/data/
+public/data/node_modules
+node_modules
